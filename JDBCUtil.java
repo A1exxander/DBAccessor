@@ -20,9 +20,9 @@ public class JDBCUtil {
     private JDBCUtil() { // Thought of overriding this with a function that takes 3 args but useless as our class is a singleton - There can only be 1 DB.
 
         try {
-            final String URL = "jdbc:mysql://127.0.0.1:3306/jobboard";
-            final String username = "API";
-            final String password = "password";
+            final String URL = "jdbc:mysql://127.0.0.1:3306/DatabaseName";
+            final String username = "";
+            final String password = "";
             connection = DriverManager.getConnection(URL, username, password);
         } catch (Exception E){
             E.printStackTrace();
