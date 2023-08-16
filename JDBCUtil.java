@@ -1,62 +1,45 @@
-package io.Jobboard.DB;
+package Utils;
+import java.sql.*;
 
-import java.sql.*; // Tiny bit longer compile time but cleaner & java.sql isn't huge, so low chance for naming collisions
-
-public class JDBCUtil {
-
+public class JDBCUtil implements iDBConnector {
+    
+    private Connection connection;
     private static JDBCUtil instance;
-    private static Connection connection;
 
-    public static JDBCUtil getInstance() {
-
-        if (instance == null){
+    private JDBCUtil() throws SQLException {
+    
+        final String username = System.getenv("DB_USERNAME"); // Use your DB credentials
+        final String password = System.getenv("DB_PASSWORD");
+        final String serverIPPort = System.getenv("DB_SERVER"); // Use your DB server's IP:PORT
+        final String serverEndpoint = "jdbc:oracle:thin:" + username + "/" + password + serverIPPort;
+        
+        connection = DriverManager.getConnection(serverEndpoint);
+        
+    }
+        
+    public static JDBCUtil getInstance() throws SQLException {
+        
+        if (instance == null) {
             instance = new JDBCUtil();
         }
-
         return instance;
-
+        
+    }  
+    
+    @Override
+    public ResultSet executeRead (String query) throws SQLException {
+        
+        Statement statement = connection.createStatement();
+        return statement.executeQuery(query);
+    
     }
-
-    private JDBCUtil() { // Thought of overriding this with a function that takes 3 args but useless as our class is a singleton - There can only be 1 DB.
-
-        try {
-            final String URL = "jdbc:mysql://127.0.0.1:3306/DatabaseName";
-            final String username = "";
-            final String password = "";
-            connection = DriverManager.getConnection(URL, username, password);
-        } catch (Exception E){
-            E.printStackTrace();
-        }
-
-    }
-
-    public ResultSet executeQuery(String query) throws SQLException {
-
-        if (connection == null){
-            return null;
-        }
-
-        Statement s = connection.createStatement();
-        ResultSet rs = s.executeQuery(query);
-
-        if (rs.next()){
-            return rs;
-        }
-        else {
-            return null;
-        }
-
-    }
-
-    public void executeUpdate(String query) throws SQLException {
-
-        if (connection == null){
-            return;
-        }
-
-        Statement s = connection.createStatement();
-        s.executeUpdate(query);
-
+    
+    @Override
+    public void executeUpdate (String query) throws SQLException { // An update is simply something that writes to database
+        
+        Statement statement = connection.createStatement();
+        statement.executeQuery(query);
+        
     }
 
 }
